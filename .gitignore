@@ -31,3 +31,28 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### OS-specific files ###
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+### Log files ###
+*.log
+logs/
+
+### Crash dumps ###
+hs_err_pid*
+replay_pid*
+
+### Local configuration and secrets ###
+.env
+.env.local
+.env.*.local
+*.properties.local
+
