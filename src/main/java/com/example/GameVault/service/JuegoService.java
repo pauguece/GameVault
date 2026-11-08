@@ -34,8 +34,7 @@ public class JuegoService {
     }
 
     public void guardarJuego(Juego juego, MultipartFile portada){
-        String nombreArchivo = "default.png";
-
+        String urlImagen = juego.getPortadaUrl() != null ? juego.getPortadaUrl() : "default.png";
         // Verificamos si el archivo no está vacío
         if (!portada.isEmpty()) {
             try {
@@ -45,8 +44,8 @@ public class JuegoService {
                     Files.createDirectories(uploadPath);
                 }
 
-                nombreArchivo = UUID.randomUUID().toString() + "_" + portada.getOriginalFilename();
-                Path filePath = uploadPath.resolve(nombreArchivo);
+                urlImagen = UUID.randomUUID().toString() + "_" + portada.getOriginalFilename();
+                Path filePath = uploadPath.resolve(urlImagen);
 
 
                 Files.copy(portada.getInputStream(), filePath);
@@ -58,7 +57,7 @@ public class JuegoService {
                 // En un proyecto real, manejaríamos esta excepción apropiadamente (ej. redirigir con error)
             }
         }
-        juego.setPortadaUrl(nombreArchivo);
+        juego.setPortadaUrl(urlImagen);
 
         juegoRepository.save(juego);
     }
@@ -70,5 +69,8 @@ public class JuegoService {
         return juegoRepository.findByTituloContainingIgnoreCase(palabra);
     }
 
+    public List<Juego> obtenerJuegosPorUsuario(Long usuarioId){
+        return juegoRepository.findByUsuarioId(usuarioId);
+    }
 
 }

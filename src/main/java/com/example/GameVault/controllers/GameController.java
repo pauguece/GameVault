@@ -1,7 +1,9 @@
 package com.example.GameVault.controllers;
 
 import com.example.GameVault.model.Juego;
+import com.example.GameVault.model.Usuario;
 import com.example.GameVault.service.JuegoService;
+import com.example.GameVault.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +26,9 @@ public class GameController {
 
     @Autowired
     private JuegoService juegoService;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     @GetMapping("/fragments-demo")
     public String fragmentsDemo() {
@@ -61,21 +66,34 @@ public class GameController {
         nuevoJuego.setCategoria(categoria);
         nuevoJuego.setDescripcion(descripcion);
         nuevoJuego.setPrecio(precio);
+        nuevoJuego.setUsuario(usuarioService.obtenerUsuarioLogueado());
+
         juegoService.guardarJuego(nuevoJuego, portada);
 
-        return "redirect:/juegos";
+        return "redirect:/mis-juegos";
+    }
+
+    @GetMapping("/mis-juegos")
+    public String dashboard(Model model){
+        Usuario logueado = usuarioService.obtenerUsuarioLogueado();
+
+        model.addAttribute("juegos", juegoService.obtenerJuegosPorUsuario(logueado.getId()));
+        model.addAttribute("usuario", logueado);
+
+        return "mis-juegos";
     }
 
     @GetMapping("/juegos/editar/{id}")
     public String editarJuego(@PathVariable Long id, Model model) {
         Juego juego = juegoService.obtenerJuegoPorId(id);
+        Usuario logueado = usuarioService.obtenerUsuarioLogueado();
 
-        if (juego != null) {
+        if (juego != null && juego.getUsuario().getId().equals(logueado.getId())) {
             model.addAttribute("juego", juego);
             return "formulario";
         }
 
-        return "redirect:/juegos";
+        return "redirect:/mis-juegos";
 
     }
 
@@ -97,7 +115,7 @@ public class GameController {
             juegoService.guardarJuego(juegoExistente, portada);
         }
 
-        return "redirect:/juegos";
+        return "redirect:/mis-juegos";
 
     }
 
@@ -116,11 +134,12 @@ public class GameController {
     @PostMapping("/juegos/eliminar/{id}")
     public String eliminarJuego(@PathVariable Long id) {
         Juego juego = juegoService.obtenerJuegoPorId(id);
+        Usuario logueado = usuarioService.obtenerUsuarioLogueado();
 
-        if (juego != null) {
+        if (juego != null && juego.getUsuario().getId().equals(logueado.getId())) {
             juegoService.eliminarJuego(id);
         }
-        return "redirect:/juegos";
+        return "redirect:/mis-juegos";
     }
 
 
